@@ -6,9 +6,7 @@ export const useTickers = () => {
       tickers
     }
   `;
-  const { loading, error, data } = useQuery(GET_TICKERS, {
-    ssr: true, // SSR を有効にします
-  });
+  const { loading, data } = useQuery(GET_TICKERS);
   const getTickers = () => {
     if (loading) return { tickers: "loading" };
     return { tickers: data };

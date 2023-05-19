@@ -4,8 +4,8 @@ import { redirectToPage } from "../features/auth/redirect-to-page";
 import { setAccessTokenCookie } from "../features/auth/set-access-token-cookie";
 import { getTokens } from "../features/auth/get-tokens";
 import { isUnAuthorizedError } from "../features/auth/is-unauthorized-error";
-import { useTickers } from "../features/hooks/useTickers";
 import Link from "next/link";
+import { useTickerDetail } from "../features/hooks/useTickerDetail";
 
 interface Data {
   title: string;
@@ -77,16 +77,16 @@ interface Props {
 const Home: React.FC<Props> = ({ data }) => {
   // 取得したデータを使用してページをレンダリング
   // GraphQLを取得
-  const { getTickers } = useTickers();
-  const tickers = getTickers().tickers;
+  const { getTickerDetail } = useTickerDetail();
+  const tickers = getTickerDetail().tickerDetail;
   if (tickers == "loading") return <div>Loading...</div>;
   return (
     <div>
       <h1>Home</h1>
       <p>{data}</p>
-      <p>useQueryからの取得値：{tickers.tickers}</p>
-      <Link href="/test" className="navbar-brand float-left">
-        別画面へ（Linkタグ）
+      <p>useQueryからの取得値：{tickers.tickerDetail}</p>
+      <Link href="/" className="navbar-brand float-left">
+        トップへ（Linkタグ）
       </Link>
     </div>
   );
