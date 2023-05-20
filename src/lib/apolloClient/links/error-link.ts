@@ -1,7 +1,7 @@
 import { FetchResult, Observable } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 
-const refreshToken = async () => {
+const executeRefreshToken = async () => {
   const response = await fetch("http://localhost:3500/api/refresh");
   const data = await response.json();
   return data.accessToken as string;
@@ -14,7 +14,7 @@ export const errorLink = onError(
         switch (err.extensions.code) {
           case "UNAUTHENTICATED":
             return new Observable<FetchResult>((observer) => {
-              refreshToken().then((accessToken) => {
+              executeRefreshToken().then((accessToken) => {
                 const oldHeaders = operation.getContext().headers || {};
                 operation.setContext({
                   headers: {
