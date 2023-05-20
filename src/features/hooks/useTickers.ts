@@ -1,9 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
-import { useContext } from "react";
-import EmailContext from "../contexts/email-context";
 
 export const useTickers = () => {
-  const { email } = useContext(EmailContext);
   const GET_TICKERS = gql`
     query GetTickers {
       tickers
