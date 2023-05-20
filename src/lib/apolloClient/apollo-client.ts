@@ -38,7 +38,7 @@ export const createApolloClient = (
     },
   });
 
-  const authLink = createAuthLink(req);
+  const authLink = createAuthLink(accessToken ?? "");
 
   return new ApolloClient({
     link: ApolloLink.from([errorLink, authLink, httpLink]),

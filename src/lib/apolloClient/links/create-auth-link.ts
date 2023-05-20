@@ -1,14 +1,14 @@
 import { ApolloLink } from "@apollo/client";
 import { IncomingMessage } from "http";
 
-export const createAuthLink = (req?: IncomingMessage) => {
+export const createAuthLink = (accessToken: string, req?: IncomingMessage) => {
   return new ApolloLink((operation, forward) => {
     if (req) {
       const headers = operation.getContext().headers || {};
       operation.setContext({
         headers: {
           ...headers,
-          Cookie: req.headers.cookie,
+          authorization: accessToken ? `Bearer ${accessToken}` : "",
         },
       });
     }

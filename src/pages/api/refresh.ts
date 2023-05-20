@@ -9,12 +9,16 @@ export default async function handler(
 ) {
   const cookies = parse(req.headers.cookie || "");
   try {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-      headers: {
-        Authorization: `Bearer ${cookies["refreshToken"]}`,
-      },
-    });
-    res.end();
+    const response = await axios.get<{ accessToken: string }>(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies["refreshToken"]}`,
+        },
+      }
+    );
+    const accessToken = response.data.accessToken;
+    res.status(200).json({ accessToken });
   } catch (error) {
     console.log(error);
     res

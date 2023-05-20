@@ -1,17 +1,42 @@
+import { FetchResult, Observable } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 
-export const errorLink = onError(({ graphQLErrors, operation, forward }) => {
-  if (graphQLErrors) {
-    for (const error of graphQLErrors) {
-      console.log(error.extensions.code);
-      if (error.extensions && error.extensions.code === "UNAUTHENTICATED") {
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-          return;
+const refreshToken = async () => {
+  const response = await fetch("http://localhost:3500/api/refresh");
+  const data = await response.json();
+  return data.accessToken as string;
+};
+
+export const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    if (graphQLErrors) {
+      for (let err of graphQLErrors) {
+        switch (err.extensions.code) {
+          case "UNAUTHENTICATED":
+            return new Observable<FetchResult>((observer) => {
+              refreshToken().then((accessToken) => {
+                const oldHeaders = operation.getContext().headers || {};
+                operation.setContext({
+                  headers: {
+                    ...oldHeaders,
+                    authorization: `Bearer ${accessToken}`,
+                  },
+                });
+
+                const subscriber = {
+                  next: observer.next.bind(observer),
+                  error: observer.error.bind(observer),
+                  complete: observer.complete.bind(observer),
+                };
+
+                // Retry the request with the new context
+                forward(operation).subscribe(subscriber);
+              });
+            });
         }
       }
     }
-  }
 
-  return forward(operation);
-});
+    if (networkError) console.log(`[Network error]: ${networkError}`);
+  }
+);
